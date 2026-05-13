@@ -32,8 +32,8 @@ class ReadabilityArticleExtractor:
         for a in soup.find_all("a"):
             a.unwrap()
 
-        cleaned = soup.decode_contents().strip()
-        if not cleaned:
+        if not soup.get_text(strip=True):
             raise ExtractionError("No readable content found on this page")
 
+        cleaned = soup.decode_contents().strip()
         return Article(title=title, content_html=cleaned, source_url=source_url)

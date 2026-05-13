@@ -2,33 +2,14 @@
 
 from __future__ import annotations
 
-import html
 import tempfile
-from datetime import datetime
 from importlib.resources import files
 from pathlib import Path
 
 from weasyprint import CSS, HTML
 
+from paper_saver.adapters.outbound.pdf_document import build_document
 from paper_saver.domain.models import Article
-
-
-def _build_html(article: Article) -> str:
-    generated = datetime.now().strftime("%Y-%m-%d %H:%M")
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>{html.escape(article.title)}</title>
-</head>
-<body>
-<h1>{html.escape(article.title)}</h1>
-<p class="source-url">{html.escape(article.source_url)}</p>
-<main>{article.content_html}</main>
-<div class="footer">Generated {generated}</div>
-</body>
-</html>
-"""
 
 
 class WeasyPrintPdfRenderer:
@@ -42,7 +23,7 @@ class WeasyPrintPdfRenderer:
         self._css_path = css_path
 
     def render(self, article: Article) -> Path:
-        document = _build_html(article)
+        document = build_document(article)
         tmp = tempfile.NamedTemporaryFile(
             prefix="paper-saver-", suffix=".pdf", delete=False
         )
