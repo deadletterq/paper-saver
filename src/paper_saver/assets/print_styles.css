@@ -39,14 +39,14 @@ html, body {
 body {
     font-family: "Iowan Old Style", "Palatino Linotype", Palatino,
                  Cambria, Georgia, "Times New Roman", serif;
-    font-size: 10.5pt;
+    font-size: 11.5pt;
     line-height: 1.38;
     text-align: left;
     hyphens: auto;
     -webkit-hyphens: auto;
     hyphenate-limit-chars: 8 4 4;
-    orphans: 2;
-    widows: 2;
+    orphans: 3;
+    widows: 3;
     font-feature-settings: "kern" 1, "liga" 1, "onum" 1;
     font-variant-numeric: oldstyle-nums;
 }
@@ -64,35 +64,35 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: 15pt;
+    font-size: 16pt;
     line-height: 1.15;
     font-weight: 700;
     margin: 0 0 0.3em 0;
 }
 
 h2 {
-    font-size: 12pt;
+    font-size: 13.5pt;
     line-height: 1.2;
     font-weight: 600;
     margin: 0.95em 0 0.15em 0;
 }
 
 h3 {
-    font-size: 10.8pt;
+    font-size: 12.5pt;
     line-height: 1.25;
     font-weight: 600;
     margin: 0.8em 0 0.1em 0;
 }
 
 h4 {
-    font-size: 10.5pt;
+    font-size: 12pt;
     line-height: 1.25;
     font-weight: 600;
     margin: 0.7em 0 0.1em 0;
 }
 
 h5 {
-    font-size: 10.5pt;
+    font-size: 12pt;
     line-height: 1.25;
     font-weight: 500;
     font-style: italic;
@@ -100,7 +100,7 @@ h5 {
 }
 
 h6 {
-    font-size: 10pt;
+    font-size: 11pt;
     line-height: 1.25;
     font-weight: 500;
     font-variant: small-caps;
@@ -140,11 +140,13 @@ table + p, dl + p, .source-url + p {
 strong, b { font-weight: 700; }
 em, i     { font-style: italic; }
 
-/* Links: no underline — the reader can't click anyway, and underlines
-   on hyperlink-dense web articles spend a surprising amount of toner. */
+/* Links: hairline underline keeps the citation cue but spends far less
+   toner than a default-weight underline on hyperlink-dense articles. */
 a {
     color: var(--ink);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 0.3pt;
+    text-underline-offset: 0.12em;
 }
 
 abbr {
