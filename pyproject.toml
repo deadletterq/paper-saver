@@ -1,7 +1,7 @@
 [project]
-name = "page-print"
+name = "paper-saver"
 version = "0.1.0"
-description = "Add your description here"
+description = "Telegram bot that converts URLs into print-friendly PDFs."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -13,3 +13,16 @@ dependencies = [
     "readability-lxml>=0.8.4.1",
     "weasyprint>=68.1",
 ]
+
+[project.scripts]
+paper-saver = "paper_saver.app:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/paper_saver"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/paper_saver/assets/print_styles.css" = "paper_saver/assets/print_styles.css"

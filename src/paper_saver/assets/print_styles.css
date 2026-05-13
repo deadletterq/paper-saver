@@ -21,6 +21,7 @@ h1 {
     line-height: 1.2;
     margin: 0 0 0.4em 0;
     page-break-after: avoid;
+    break-after: avoid-page;
 }
 
 h2 {
@@ -28,6 +29,7 @@ h2 {
     line-height: 1.25;
     margin: 1.2em 0 0.4em 0;
     page-break-after: avoid;
+    break-after: avoid-page;
 }
 
 h3 {
@@ -35,9 +37,11 @@ h3 {
     line-height: 1.3;
     margin: 1em 0 0.3em 0;
     page-break-after: avoid;
+    break-after: avoid-page;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h4, h5, h6 {
+    page-break-after: avoid;
     break-after: avoid-page;
 }
 
