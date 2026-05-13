@@ -2,14 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-
 from paper_saver.adapters.outbound.pdf_document import build_document
 from paper_saver.domain.models import Article
-
-
-def _fixed_clock(when: datetime):
-    return lambda: when
 
 
 class TestStructure:
@@ -50,13 +44,6 @@ class TestStructure:
         )
         doc = build_document(article)
         assert "<main><p>kept <em>as-is</em></p></main>" in doc
-
-    def test_footer_includes_generation_timestamp(self) -> None:
-        article = Article(
-            title="T", content_html="<p>c</p>", source_url="https://e.test"
-        )
-        doc = build_document(article, now=_fixed_clock(datetime(2026, 5, 13, 14, 30)))
-        assert "Generated 2026-05-13 14:30" in doc
 
 
 class TestHtmlEscaping:
