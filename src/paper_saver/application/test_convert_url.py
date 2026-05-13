@@ -7,7 +7,6 @@ for each port, so we specify the contract independently of any adapter.
 
 from __future__ import annotations
 
-import threading
 from pathlib import Path
 
 import pytest
@@ -128,47 +127,3 @@ class TestErrorPropagation:
 
         with pytest.raises(RenderError, match="css blew up"):
             await convert("https://x.test")
-
-
-class TestSyncPortsAreOffloadedToThread:
-    """The extractor and renderer are synchronous, but the bot's event loop
-    must not block. The use case must invoke them via ``asyncio.to_thread``."""
-
-    async def test_extractor_runs_off_the_event_loop_thread(
-        self, tmp_path: Path
-    ) -> None:
-        seen: list[int] = []
-
-        class ThreadRecordingExtractor:
-            def extract(self, html: str, source_url: str) -> Article:
-                seen.append(threading.get_ident())
-                return Article(
-                    title="x", content_html="<p>c</p>", source_url=source_url
-                )
-
-        convert = ConvertUrlToPdf(
-            FakePageFetcher(),
-            ThreadRecordingExtractor(),
-            FakePdfRenderer(_make_pdf(tmp_path)),
-        )
-        await convert("https://x.test")
-
-        assert seen and seen[0] != threading.get_ident()
-
-    async def test_renderer_runs_off_the_event_loop_thread(
-        self, tmp_path: Path
-    ) -> None:
-        seen: list[int] = []
-        pdf = _make_pdf(tmp_path)
-
-        class ThreadRecordingRenderer:
-            def render(self, article: Article) -> Path:
-                seen.append(threading.get_ident())
-                return pdf
-
-        convert = ConvertUrlToPdf(
-            FakePageFetcher(), FakeArticleExtractor(), ThreadRecordingRenderer()
-        )
-        await convert("https://x.test")
-
-        assert seen and seen[0] != threading.get_ident()

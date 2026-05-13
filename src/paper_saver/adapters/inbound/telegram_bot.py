@@ -10,7 +10,6 @@ from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
-    ContextTypes,
     MessageHandler,
     filters,
 )
@@ -50,11 +49,11 @@ class TelegramBotAdapter:
             MessageHandler(filters.TEXT & ~filters.COMMAND, self._on_message)
         )
 
-    async def _on_intro(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    async def _on_intro(self, update: Update, _) -> None:
         if update.message is not None:
             await update.message.reply_text(INTRO_TEXT)
 
-    async def _on_message(self, update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    async def _on_message(self, update: Update, _) -> None:
         message = update.message
         if message is None or not message.text:
             return
