@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True, slots=True)
@@ -12,3 +12,4 @@ class Article:
     title: str
     content_html: str
     source_url: str
+    references: tuple[str, ...] = field(default_factory=tuple)

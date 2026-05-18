@@ -84,3 +84,44 @@ class TestHtmlEscaping:
         doc = build_document(article)
         assert "<p><strong>bold</strong> text</p>" in doc
         assert "&lt;strong&gt;" not in doc
+
+
+class TestEndnotes:
+    """Anchor URLs are stripped from the body and appended here as a
+    numbered list, so the reader can still chase a citation on paper."""
+
+    def test_no_endnotes_section_when_no_references(self) -> None:
+        article = Article(
+            title="T", content_html="<p>c</p>", source_url="https://e.test"
+        )
+        doc = build_document(article)
+        assert "endnotes" not in doc
+
+    def test_references_render_as_ordered_list_in_endnotes_section(self) -> None:
+        article = Article(
+            title="T",
+            content_html="<p>c</p>",
+            source_url="https://e.test",
+            references=("https://a.test/one", "https://b.test/two"),
+        )
+        doc = build_document(article)
+        assert (
+            '<section class="endnotes"><ol>'
+            "<li>https://a.test/one</li>"
+            "<li>https://b.test/two</li>"
+            "</ol></section>" in doc
+        )
+
+    def test_reference_urls_are_html_escaped(self) -> None:
+        """References come from arbitrary page hrefs — ampersands and angle
+        brackets must not corrupt the appendix markup."""
+        article = Article(
+            title="T",
+            content_html="<p>c</p>",
+            source_url="https://e.test",
+            references=("https://e.test/?q=<bad>&x=1",),
+        )
+        doc = build_document(article)
+        assert "<bad>" not in doc
+        assert "&lt;bad&gt;" in doc
+        assert "&amp;x=1" in doc

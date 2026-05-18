@@ -23,6 +23,13 @@ def build_document(article: Article) -> str:
 <h1>{html.escape(article.title)}</h1>
 <p class="source-url">{html.escape(article.source_url)}</p>
 <main>{article.content_html}</main>
-</body>
+{_render_endnotes(article.references)}</body>
 </html>
 """
+
+
+def _render_endnotes(references: tuple[str, ...]) -> str:
+    if not references:
+        return ""
+    items = "".join(f"<li>{html.escape(url)}</li>" for url in references)
+    return f'<section class="endnotes"><ol>{items}</ol></section>\n'

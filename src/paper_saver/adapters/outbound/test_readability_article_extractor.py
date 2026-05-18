@@ -99,11 +99,13 @@ class TestScriptsAndStylesAreStripped:
         assert "style=" not in article.content_html
 
 
-class TestAnchorsAreUnwrapped:
+class TestAnchorsBecomeNumberedReferences:
     """We don't want long URLs trailing through printed text. <a> becomes
-    plain text — the label survives, the href doesn't."""
+    plain label text followed by a ``[n]`` superscript; the href moves to a
+    numbered list collected on ``article.references`` and rendered as an
+    appendix by the document template."""
 
-    def test_anchor_tag_is_removed(
+    def test_anchor_tag_is_removed_from_body(
         self, extractor: ReadabilityArticleExtractor
     ) -> None:
         html = _page('<p>See <a href="https://elsewhere.test">the source</a>.</p>')
@@ -118,12 +120,85 @@ class TestAnchorsAreUnwrapped:
         article = extractor.extract(html, "https://e.test")
         assert "the source" in article.content_html
 
-    def test_href_value_is_discarded(
+    def test_raw_url_does_not_appear_inline(
+        self, extractor: ReadabilityArticleExtractor
+    ) -> None:
+        """URLs would break the measure if printed in the body — they belong
+        in the endnote appendix, not in running prose."""
+        html = _page('<p>See <a href="https://elsewhere.test/x?y=1">label</a>.</p>')
+        article = extractor.extract(html, "https://e.test")
+        assert "elsewhere.test" not in article.content_html
+
+    def test_anchor_is_replaced_with_numbered_marker(
+        self, extractor: ReadabilityArticleExtractor
+    ) -> None:
+        html = _page('<p>See <a href="https://elsewhere.test">the source</a>.</p>')
+        article = extractor.extract(html, "https://e.test")
+        assert 'the source<sup class="ref">[1]</sup>' in article.content_html
+
+    def test_href_is_collected_into_references(
         self, extractor: ReadabilityArticleExtractor
     ) -> None:
         html = _page('<p>See <a href="https://elsewhere.test/x?y=1">label</a>.</p>')
         article = extractor.extract(html, "https://e.test")
-        assert "elsewhere.test" not in article.content_html
+        assert article.references == ("https://elsewhere.test/x?y=1",)
+
+    def test_references_are_numbered_in_first_appearance_order(
+        self, extractor: ReadabilityArticleExtractor
+    ) -> None:
+        html = _page(
+            '<p><a href="https://a.test">first</a> then '
+            '<a href="https://b.test">second</a>.</p>'
+        )
+        article = extractor.extract(html, "https://e.test")
+        assert article.references == ("https://a.test", "https://b.test")
+        assert 'first<sup class="ref">[1]</sup>' in article.content_html
+        assert 'second<sup class="ref">[2]</sup>' in article.content_html
+
+    def test_duplicate_urls_share_a_reference_number(
+        self, extractor: ReadabilityArticleExtractor
+    ) -> None:
+        """Avoid bloating the appendix when an article links the same source
+        repeatedly."""
+        html = _page(
+            '<p><a href="https://same.test">one</a> and '
+            '<a href="https://same.test">again</a>.</p>'
+        )
+        article = extractor.extract(html, "https://e.test")
+        assert article.references == ("https://same.test",)
+        assert 'one<sup class="ref">[1]</sup>' in article.content_html
+        assert 'again<sup class="ref">[1]</sup>' in article.content_html
+
+    def test_relative_hrefs_resolve_against_source_url(
+        self, extractor: ReadabilityArticleExtractor
+    ) -> None:
+        """A relative link is useless on paper unless we resolve it; the
+        reader can't expand ``/foo`` against a URL bar they don't have."""
+        html = _page('<p>See <a href="/sub/page">here</a>.</p>')
+        article = extractor.extract(html, "https://e.test/article")
+        assert article.references == ("https://e.test/sub/page",)
+
+    @pytest.mark.parametrize(
+        "href",
+        [
+            "",
+            "#section-2",
+            "mailto:hi@example.test",
+            "javascript:alert(1)",
+            "tel:+1234",
+        ],
+    )
+    def test_unusable_hrefs_are_silently_unwrapped(
+        self, extractor: ReadabilityArticleExtractor, href: str
+    ) -> None:
+        """Fragment, mail, tel, and script links can't help a paper reader —
+        unwrap without adding them to the appendix."""
+        html = _page(f'<p>See <a href="{href}">label</a>.</p>')
+        article = extractor.extract(html, "https://e.test/article")
+        assert article.references == ()
+        assert "<a " not in article.content_html
+        assert "<sup" not in article.content_html
+        assert "label" in article.content_html
 
 
 class TestFailureModes:

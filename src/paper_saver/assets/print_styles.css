@@ -11,7 +11,7 @@
 
 @page {
     size: A4;
-    margin: 1.5cm 1.7cm 1.7cm 1.7cm;
+    margin: 1.5cm 2.2cm 2.0cm 2.2cm;
 
     @top-right {
         content: counter(page);
@@ -44,7 +44,9 @@ body {
     text-align: left;
     hyphens: auto;
     -webkit-hyphens: auto;
-    hyphenate-limit-chars: 8 4 4;
+    hyphenate-limit-chars: 6 3 3;
+    hyphenate-limit-lines: 2;
+    hyphenate-limit-last: always;
     orphans: 3;
     widows: 3;
     font-feature-settings: "kern" 1, "liga" 1, "onum" 1;
@@ -66,7 +68,7 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
     font-size: 16pt;
     line-height: 1.15;
-    font-weight: 700;
+    font-weight: 600;
     margin: 0 0 0.3em 0;
 }
 
@@ -113,6 +115,8 @@ h6 {
 p {
     margin: 0;
     text-indent: 1em;
+    text-align: justify;
+    text-justify: inter-word;
 }
 
 h1 + p, h2 + p, h3 + p, h4 + p, h5 + p, h6 + p,
@@ -140,13 +144,11 @@ table + p, dl + p, .source-url + p {
 strong, b { font-weight: 700; }
 em, i     { font-style: italic; }
 
-/* Links: hairline underline keeps the citation cue but spends far less
-   toner than a default-weight underline on hyperlink-dense articles. */
+/* Links: no underline on print — the paper isn't interactive, and the
+   underline spends toner for a cue the reader can't act on. */
 a {
     color: var(--ink);
-    text-decoration: underline;
-    text-decoration-thickness: 0.3pt;
-    text-underline-offset: 0.12em;
+    text-decoration: none;
 }
 
 abbr {
@@ -173,7 +175,6 @@ blockquote {
     margin: 0.35em 0 0.35em 0.6em;
     padding: 0 0 0 0.6em;
     border-left: 0.4pt solid var(--ink);
-    font-style: italic;
     color: var(--ink);
     text-indent: 0;
     break-inside: avoid;
@@ -261,8 +262,11 @@ dt { font-weight: 600; }
 dd { margin: 0 0 0.2em 1.1em; text-indent: 0; }
 
 /* Visual media — suppressed for paper economy ---------------------- */
+/* Captions hidden too: orphan "Figure 3: ..." lines waste ink and
+   confuse the reader once the figure they describe is gone. */
 
-img, figure, picture, video, iframe, svg, canvas, audio, embed, object {
+img, figure, picture, video, iframe, svg, canvas, audio, embed, object,
+figcaption, figure > p {
     display: none !important;
 }
 
@@ -309,4 +313,48 @@ hr {
     width: 25%;
     margin: 0.6em auto;
     height: 0;
+}
+
+/* Endnote URL appendix --------------------------------------------- */
+/* Inline anchor references in the body collapse to [n]; the resolved
+   URLs are listed here, monospace and tight, at the end of the article. */
+
+sup.ref {
+    font-variant-numeric: lining-nums;
+    font-feature-settings: "kern" 1;
+    line-height: 0;
+}
+
+.endnotes {
+    margin: 1.2em 0 0 0;
+    padding-top: 0.4em;
+    border-top: 0.4pt solid var(--ink);
+}
+
+.endnotes ol {
+    margin: 0;
+    padding-left: 2.2em;
+    counter-reset: ol-counter;
+}
+
+.endnotes ol > li {
+    font-family: "Courier Prime", "Iosevka", "JetBrains Mono",
+                 "IBM Plex Mono", "Courier New", Courier, monospace;
+    font-size: 8.5pt;
+    line-height: 1.3;
+    font-feature-settings: normal;
+    font-variant-numeric: lining-nums;
+    text-indent: 0;
+    word-break: break-all;
+    break-inside: avoid;
+    margin-bottom: 0.05em;
+    counter-increment: ol-counter;
+}
+
+.endnotes ol > li::before {
+    content: "[" counter(ol-counter) "]";
+    width: 2em;
+    left: -2.2em;
+    text-align: left;
+    font-variant-numeric: lining-nums;
 }
