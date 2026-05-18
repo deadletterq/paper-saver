@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.14.3",
-    "httpx>=0.28.1",
+    "curl-cffi>=0.15.0",
     "lxml>=6.1.0",
     "python-dotenv>=1.2.2",
     "python-telegram-bot>=22.7",
@@ -42,7 +42,10 @@ dev = [
 testpaths = ["src"]
 python_files = ["test_*.py"]
 asyncio_mode = "auto"
-addopts = "-ra --strict-markers --import-mode=importlib"
+addopts = "-ra --strict-markers --import-mode=importlib -m 'not network'"
+markers = [
+    "network: hits the real internet; opt in with `-m network` or `-m 'network or not network'`",
+]
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning:telegram.*",

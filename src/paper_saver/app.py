@@ -6,7 +6,7 @@ import logging
 import sys
 
 from paper_saver.adapters.inbound.telegram_bot import TelegramBotAdapter
-from paper_saver.adapters.outbound.httpx_page_fetcher import HttpxPageFetcher
+from paper_saver.adapters.outbound.curl_cffi_page_fetcher import CurlCffiPageFetcher
 from paper_saver.adapters.outbound.readability_article_extractor import (
     ReadabilityArticleExtractor,
 )
@@ -37,7 +37,7 @@ def run() -> None:
         sys.exit(1)
 
     convert = ConvertUrlToPdf(
-        fetcher=HttpxPageFetcher(),
+        fetcher=CurlCffiPageFetcher(),
         extractor=ReadabilityArticleExtractor(),
         renderer=WeasyPrintPdfRenderer(),
     )
